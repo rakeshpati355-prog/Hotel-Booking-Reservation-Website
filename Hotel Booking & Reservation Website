@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hotel Booking & Reservation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 24px 16px 32px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: -20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(2, 6, 23, 0.06);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 10px 0 4px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--primary);
+      border-color: transparent;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    button:hover { background: var(--primary-dark); }
+    button.secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    button.secondary:hover { background: #cbd5e1; }
+    button.danger {
+      background: var(--danger);
+    }
+    button.danger:hover { background: #b91c1c; }
+
+    .room-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .room-option input { width: auto; }
+    .room-option .info {
+      flex: 1;
+    }
+    .room-option .info .name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .room-option .info .meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .room-option .price {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--primary);
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .booking-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .booking-item .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .booking-item .top .title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .booking-item .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .booking-item .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .booking-item .actions button {
+      margin-top: 0;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 16px;
+    }
+
+    dialog {
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      max-width: 420px;
+      width: 92%;
+      box-shadow: 0 20px 50px rgba(2, 6, 23, 0.25);
+    }
+    dialog::backdrop {
+      background: rgba(2, 6, 23, 0.45);
+    }
+    .dialog-content {
+      padding: 18px;
+    }
+    .dialog-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+    .dialog-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+    .dialog-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+    .dialog-actions button {
+      margin-top: 0;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotel Booking & Reservation</h1>
+    <p>Simple single‑file project for Web Technology (VS Code friendly)</p>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- LEFT: Booking form -->
+      <section class="card">
+        <h2>Book a Room</h2>
+        <form id="bookingForm">
+          <label for="guestName">Full Name</label>
+          <input id="guestName" name="guestName" required placeholder="e.g. Priya Sharma" />
+
+          <div class="row">
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="you@example.com" />
+            </div>
+            <div>
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" required placeholder="9876543210" pattern="[0-9]{10}" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="checkIn">Check‑in Date</label>
+              <input id="checkIn" name="checkIn" type="date" required />
+            </div>
+            <div>
+              <label for="checkOut">Check‑out Date</label>
+              <input id="checkOut" name="checkOut" type="date" required />
+            </div>
+          </div>
+
+          <label>Room Type</label>
+          <div id="roomsContainer">
+            <!-- Rooms injected by JS -->
+          </div>
+
+          <label for="special">Special Requests (optional)</label>
+          <textarea id="special" name="special" rows="3" placeholder="Late check‑in, extra bed, etc."></textarea>
+
+          <div class="row">
+            <div>
+              <label for="guests">Number of Guests</label>
+              <input id="guests" name="guests" type="number" min="1" max="10" value="2" required />
+            </div>
+            <div>
+              <label for="totalPrice">Total Price (₹)</label>
+              <input id="totalPrice" name="totalPrice" type="number" readonly />
+            </div>
+          </div>
+
+          <button type="submit">Confirm Booking</button>
+          <p class="note">Data is stored only in your browser (localStorage). No server is used.</p>
+        </form>
+      </section>
+
+      <!-- RIGHT: My bookings -->
+      <section class="card">
+        <h2>My Bookings</h2>
+        <div id="bookingsList">
+          <div class="empty">No bookings yet. Make your first booking on the left.</div>
+        </div>
+        <button id="clearAllBtn" class="secondary danger" style="display:none;">Clear All Bookings</button>
+      </section>
+    </div>
+  </main>
+
+  <!-- Confirmation dialog -->
+  <dialog id="confirmDialog">
+    <div class="dialog-content">
+      <h3 class="dialog-title">Confirm Booking</h3>
+      <p class="dialog-sub" id="confirmSummary"></p>
+      <div class="dialog-actions">
+        <button class="secondary" id="cancelConfirm">Cancel</button>
+        <button id="finalConfirm">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Room data ---
+    const rooms = [
+      { id: "standard", name: "Standard Room", capacity: 2, pricePerNight: 1500 },
+      { id: "deluxe",   name: "Deluxe Room",   capacity: 3, pricePerNight: 2500 },
+      { id: "suite",    name: "Executive Suite", capacity: 4, pricePerNight: 4000 }
+    ];
+
+    const roomsContainer = document.getElementById("roomsContainer");
+    const bookingForm = document.getElementById("bookingForm");
+    const checkInInput = document.getElementById("checkIn");
+    const checkOutInput = document.getElementById("checkOut");
+    const guestsInput = document.getElementById("guests");
+    const totalPriceInput = document.getElementById("totalPrice");
+    const bookingsList = document.getElementById("bookingsList");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+
+    const confirmDialog = document.getElementById("confirmDialog");
+    const confirmSummary = document.getElementById("confirmSummary");
+    const cancelConfirmBtn = document.getElementById("cancelConfirm");
+    const finalConfirmBtn = document.getElementById("finalConfirm");
+
+    let pendingBooking = null;
+
+    // --- Render rooms ---
+    function renderRooms() {
+      roomsContainer.innerHTML = "";
+      rooms.forEach((room, idx) => {
+        const label = document.createElement("label");
+        label.className = "room-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "roomType";
+        input.value = room.id;
+        input.required = true;
+        if (idx === 0) input.checked = true;
+
+        const info = document.createElement("div");
+        info.className = "info";
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = room.name;
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `Up to ${room.capacity} guests • ₹${room.pricePerNight}/night`;
+
+        info.appendChild(name);
+        info.appendChild(meta);
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = `₹${room.pricePerNight}`;
+
+        label.appendChild(input);
+        label.appendChild(info);
+        label.appendChild(price);
+
+        roomsContainer.appendChild(label);
+      });
+    }
+
+    // --- Helpers ---
+    function getSelectedRoom() {
+      const selected = document.querySelector('input[name="roomType"]:checked');
+      if (!selected) return null;
+      return rooms.find(r => r.id === selected.value);
+    }
+
+    function nightsBetween(checkIn, checkOut) {
+      const start = new Date(checkIn);
+      const end = new Date(checkOut);
+      const diff = end - start;
+      const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      return nights > 0 ? nights : 0;
+    }
+
+    function updateTotalPrice() {
+      const room = getSelectedRoom();
+      const checkIn = checkInInput.value;
+      const checkOut = checkOutInput.value;
+      if (!room || !checkIn || !checkOut) {
+        totalPriceInput.value = "";
+        return;
+      }
+      const nights = nightsBetween(checkIn, checkOut);
+      const total = nights * room.pricePerNight;
+      totalPriceInput.value = total || "";
+    }
+
+    // --- Storage (localStorage) ---
+    function loadBookings() {
+      const raw = localStorage.getItem("hotelBookings");
+      if (!raw) return [];
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return [];
+      }
+    }
+
+    function saveBookings(bookings) {
+      localStorage.setItem("hotelBookings", JSON.stringify(bookings));
+    }
+
+    function renderBookings() {
+      const bookings = loadBookings();
+      bookingsList.innerHTML = "";
+      if (bookings.length === 0) {
+        bookingsList.innerHTML = '<div class="empty">No bookings yet. Make your first booking on the left.</div>';
+        clearAllBtn.style.display = "none";
+        return;
+      }
+      clearAllBtn.style.display = "inline-block";
+
+      bookings.forEach((b, idx) => {
+        const item = document.createElement("div");
+        item.className = "booking-item";
+
+        const top = document.createElement("div");
+        top.className = "top";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = `${b.roomName} • ${b.guestName}`;
+
+        const actionsTop = document.createElement("div");
+        actionsTop.className = "actions";
+
+        const viewBtn = document.createElement("button");
+        viewBtn.className = "secondary";
+        viewBtn.textContent = "View";
+        viewBtn.onclick = () => alert(
+          `Booking #${idx + 1}\n\n` +
+          `Name: ${b.guestName}\n` +
+          `Email: ${b.email}\nPhone: ${b.phone}\n` +
+          `Room: ${b.roomName}\n` +
+          `Check‑in: ${b.checkIn}\nCheck‑out: ${b.checkOut}\n` +
+          `Guests: ${b.guests}\nTotal: ₹${b.totalPrice}\n` +
+          (b.special ? `Special: ${b.special}` : "")
+        );
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "danger";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.onclick = () => {
+          if (!confirm("Cancel this booking?")) return;
+          const list = loadBookings();
+          list.splice(idx, 1);
+          saveBookings(list);
+          renderBookings();
+        };
+
+        actionsTop.appendChild(viewBtn);
+        actionsTop.appendChild(cancelBtn);
+
+        top.appendChild(title);
+        top.appendChild(actionsTop);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `${b.checkIn} → ${b.checkOut} • ${b.guests} guest(s) • ₹${b.totalPrice}`;
+
+        item.appendChild(top);
+        item.appendChild(meta);
+        bookingsList.appendChild(item);
+      });
+    }
+
+    // --- Form logic ---
+    [checkInInput, checkOutInput, guestsInput].forEach(el => {
+      el.addEventListener("input", updateTotalPrice);
+    });
+    roomsContainer.addEventListener("change", updateTotalPrice);
+
+    bookingForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const room = getSelectedRoom();
+      const guestName = document.getElementById("guestName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const checkIn = checkInInput.value;
+      const checkOut = checkOutInput.value;
+      const guests = parseInt(guestsInput.value, 10);
+      const special = document.getElementById("special").value.trim();
+      const total = parseInt(totalPriceInput.value || "0", 10);
+
+      if (!room) {
+        alert("Please select a room type.");
+        return;
+      }
+      if (guests > room.capacity) {
+        alert(`Selected room supports up to ${room.capacity} guests.`);
+        return;
+      }
+      if (!checkIn || !checkOut) {
+        alert("Please select check‑in and check‑out dates.");
+        return;
+      }
+      if (nightsBetween(checkIn, checkOut) <= 0) {
+        alert("Check‑out date must be after check‑in date.");
+        return;
+      }
+      if (total <= 0) {
+        alert("Total price is invalid. Check your dates.");
+        return;
+      }
+
+      pendingBooking = {
+        guestName,
+        email,
+        phone,
+        checkIn,
+        checkOut,
+        roomId: room.id,
+        roomName: room.name,
+        pricePerNight: room.pricePerNight,
+        guests,
+        special,
+        totalPrice: total,
+        bookedAt: new Date().toISOString()
+      };
+
+      confirmSummary.textContent =
+        `${pendingBooking.roomName} for ${pendingBooking.guests} guest(s)\n` +
+        `${pendingBooking.checkIn} → ${pendingBooking.checkOut}\n` +
+        `Total: ₹${pendingBooking.totalPrice}`;
+
+      confirmDialog.showModal();
+    });
+
+    cancelConfirmBtn.addEventListener("click", () => {
+      confirmDialog.close();
+      pendingBooking = null;
+    });
+
+    finalConfirmBtn.addEventListener("click", () => {
+      if (!pendingBooking) return;
+      const bookings = loadBookings();
+      bookings.unshift(pendingBooking); // latest first
+      saveBookings(bookings);
+
+      confirmDialog.close();
+      pendingBooking = null;
+      bookingForm.reset();
+      // Reset date to today/tomorrow defaults
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      checkInInput.value = today.toISOString().slice(0, 10);
+      checkOutInput.value = tomorrow.toISOString().slice(0, 10);
+      updateTotalPrice();
+      renderBookings();
+      alert("Booking confirmed! Check 'My Bookings' on the right.");
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+      if (!confirm("Clear ALL bookings? This cannot be undone.")) return;
+      saveBookings([]);
+      renderBookings();
+    });
+
+    // --- Init ---
+    renderRooms();
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    checkInInput.value = today.toISOString().slice(0, 10);
+    checkOutInput.value = tomorrow.toISOString().slice(0, 10);
+    updateTotalPrice();
+    renderBookings();
+  </script>
+</body>
+</html>
